@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { IAdvocates } from "./types/IAdvocates";
 
 export default function Home() {
-  const [advocates, setAdvocates] = useState([]);
-  const [filteredAdvocates, setFilteredAdvocates] = useState([]);
+  const [advocates, setAdvocates] = useState<IAdvocates[]>([]);
+  const [filteredAdvocates, setFilteredAdvocates] = useState<IAdvocates[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     console.log("fetching advocates...");
@@ -16,20 +18,23 @@ export default function Home() {
     });
   }, []);
 
-  const onChange = (e) => {
-    const searchTerm = e.target.value;
+  const onChange = ({
+    target: { value },
+  }: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(value.toLocaleLowerCase());
 
-    document.getElementById("search-term").innerHTML = searchTerm;
+    console.log('filtering advocates...');
 
-    console.log("filtering advocates...");
     const filteredAdvocates = advocates.filter((advocate) => {
       return (
-        advocate.firstName.includes(searchTerm) ||
-        advocate.lastName.includes(searchTerm) ||
-        advocate.city.includes(searchTerm) ||
-        advocate.degree.includes(searchTerm) ||
-        advocate.specialties.includes(searchTerm) ||
-        advocate.yearsOfExperience.includes(searchTerm)
+        advocate.firstName.toLocaleLowerCase().includes(searchTerm) ||
+        advocate.lastName.toLocaleLowerCase().includes(searchTerm) ||
+        advocate.city.toLocaleLowerCase().includes(searchTerm) ||
+        advocate.degree.toLocaleLowerCase().includes(searchTerm) ||
+        advocate.specialties.some((specialty) =>
+          specialty.toLocaleLowerCase().includes(searchTerm)
+        ) ||
+        advocate.yearsOfExperience.toString().includes(searchTerm)
       );
     });
 
@@ -37,8 +42,8 @@ export default function Home() {
   };
 
   const onClick = () => {
-    console.log(advocates);
     setFilteredAdvocates(advocates);
+    setSearchTerm("");
   };
 
   return (
@@ -69,14 +74,14 @@ export default function Home() {
         <tbody>
           {filteredAdvocates.map((advocate) => {
             return (
-              <tr>
+              <tr key={advocate.id}>
                 <td>{advocate.firstName}</td>
                 <td>{advocate.lastName}</td>
                 <td>{advocate.city}</td>
                 <td>{advocate.degree}</td>
                 <td>
-                  {advocate.specialties.map((s) => (
-                    <div>{s}</div>
+                  {advocate.specialties.map((specialty) => (
+                    <div key={specialty}>{specialty}</div>
                   ))}
                 </td>
                 <td>{advocate.yearsOfExperience}</td>
