@@ -63,7 +63,9 @@ export default function Home() {
           ? "Loading…"
           : error
           ? error
-          : `${filteredAdvocates.length} result${filteredAdvocates.length === 1 ? "" : "s"}`}
+          : `${filteredAdvocates.length} result${
+              filteredAdvocates.length === 1 ? "" : "s"
+            }`}
       </p>
       <div>
         <label htmlFor="search-input">Search</label>
@@ -85,13 +87,15 @@ export default function Home() {
       <br />
       <table>
         <thead>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>City</th>
-          <th>Degree</th>
-          <th>Specialties</th>
-          <th>Years of Experience</th>
-          <th>Phone Number</th>
+          <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>City</th>
+            <th>Degree</th>
+            <th>Specialties</th>
+            <th>Years of Experience</th>
+            <th>Phone Number</th>
+          </tr>
         </thead>
         <tbody>
           {filteredAdvocates.map((advocate) => {
