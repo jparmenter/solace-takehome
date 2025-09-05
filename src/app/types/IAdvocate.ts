@@ -1,4 +1,4 @@
-export interface IAdvocates {
+export interface IAdvocate {
   id: number;
   firstName: string;
   lastName: string;
