@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { IAdvocates } from "./types/IAdvocates";
+import { useState } from "react";
 import { useDebounced } from "./services/useDebounce";
+import { useAdvocates } from "./services/useAdvocates";
 
 export default function Home() {
-  const [advocates, setAdvocates] = useState<IAdvocates[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<null | string>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounced(searchTerm, 300);
+  const { data, loading, error } = useAdvocates({
+    query: debouncedSearchTerm,
+    page: 1,
+    perPage: 10,
+  });
 
   const formatPhoneNumber = (phone: number) => {
     const phoneStr = phone.toString();
@@ -17,46 +19,6 @@ export default function Home() {
       6
     )}`;
   };
-
-  useEffect(() => {
-    console.log("fetching advocates...");
-    const fetchAdvocates = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch("/api/advocates");
-        const jsonResponse = await response.json();
-        setAdvocates(jsonResponse.data);
-      } catch (error) {
-        setError("Failed to fetch advocates");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAdvocates();
-  }, []);
-
-  const filteredAdvocates = useMemo(() => {
-    console.log("filtering advocates...");
-
-    const sanitizedQuery = debouncedSearchTerm.trim().toLocaleLowerCase();
-
-    return advocates.filter((advocate) => {
-      const group = [
-        advocate.firstName,
-        advocate.lastName,
-        advocate.city,
-        advocate.degree,
-        advocate.specialties.join(" "),
-        String(advocate.yearsOfExperience),
-        advocate.phoneNumber,
-      ]
-        .join(" ")
-        .toLowerCase();
-
-      return group.includes(sanitizedQuery);
-    });
-  }, [advocates, debouncedSearchTerm]);
 
   const onReset = () => {
     setSearchTerm("");
@@ -93,9 +55,7 @@ export default function Home() {
           ? "Loading…"
           : error
           ? error
-          : `${filteredAdvocates.length} result${
-              filteredAdvocates.length === 1 ? "" : "s"
-            }`}
+          : `${data.length} result${data.length === 1 ? "" : "s"}`}
 
         {searchTerm && (
           <>
@@ -131,7 +91,7 @@ export default function Home() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {filteredAdvocates.map((advocate) => {
+            {data.map((advocate) => {
               return (
                 <tr key={advocate.id} className="hover:bg-solace-50">
                   <td className="px-3 py-1.5">{advocate.firstName}</td>
