@@ -6,11 +6,13 @@ import { useAdvocates } from "./services/useAdvocates";
 
 export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(5);
   const debouncedSearchTerm = useDebounced(searchTerm, 300);
   const { data, loading, error } = useAdvocates({
     query: debouncedSearchTerm,
-    page: 1,
-    perPage: 10,
+    page,
+    perPage,
   });
 
   const formatPhoneNumber = (phone: number) => {
@@ -112,7 +114,10 @@ export default function Home() {
                   </td>
                   <td className="px-3 py-1.5">{advocate.yearsOfExperience}</td>
                   <td className="px-3 py-1.5">
-                    <a href={`tel:${advocate.phoneNumber}`} className="text-blue-500 hover:underline">
+                    <a
+                      href={`tel:${advocate.phoneNumber}`}
+                      className="text-blue-500 hover:underline"
+                    >
                       {formatPhoneNumber(advocate.phoneNumber)}
                     </a>
                   </td>
@@ -121,6 +126,28 @@ export default function Home() {
             })}
           </tbody>
         </table>
+      </div>
+      <div>
+        <button disabled={page === 1} onClick={() => setPage((prev) => --prev)}>
+          Previous
+        </button>
+        <select
+          onChange={({ target: { value } }) => {
+            console.log(value);
+            setPerPage(parseInt(value));
+          }}
+          value={perPage}
+        >
+          <option value="5">Default</option>
+          <option value="6">6</option>
+          <option value="10">10</option>
+        </select>
+        <button
+          // disabled={} last page equals total
+          onClick={() => setPage((prev) => ++prev)}
+        >
+          Next
+        </button>
       </div>
     </main>
   );

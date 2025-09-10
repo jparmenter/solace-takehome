@@ -20,7 +20,7 @@ export const useAdvocates = (params: Params) => {
     () => ({
       q: params.query.trim(),
       page: Math.max(1, params.page),
-      perPage: Math.min(Math.max(1, params.perPage), 50),
+      perPage: Math.max(5, params.perPage),
       // sort: params.sort,
       // dir: params.dir,
     }),
